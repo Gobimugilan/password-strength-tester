@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Password Strength Checker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-color: #1e1e2f;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .glass-container {
+      background: #2a2a3d;
+      box-shadow: 9px 9px 16px #1a1a2a, -9px -9px 16px #32324a;
+      border-radius: 20px;
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      color: #f3f3f3;
+    }
+
+    input[type="password"] {
+      background: #2a2a3d;
+      box-shadow: inset 4px 4px 10px #1a1a2a, inset -4px -4px 10px #32324a;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      color: #f3f3f3;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    .button {
+      background: #2a2a3d;
+      box-shadow: 4px 4px 10px #1a1a2a, -4px -4px 10px #32324a;
+      padding: 12px;
+      border: none;
+      width: 100%;
+      border-radius: 10px;
+      color: #f3f3f3;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .button:hover {
+      box-shadow: inset 4px 4px 10px #1a1a2a, inset -4px -4px 10px #32324a;
+    }
+
+    .strength, .suggestion {
+      font-size: 14px;
+      margin-top: 15px;
+    }
+
+    code {
+      background-color: #444;
+      padding: 4px 8px;
+      border-radius: 5px;
+      display: inline-block;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body class="flex justify-center items-center min-h-screen px-4">
+
+  <div class="glass-container">
+    <h2 class="text-center text-xl font-semibold mb-6">Password Strength Checker</h2>
+
+    <form id="passwordForm">
+      <label for="password">Enter your password:</label>
+      <input type="password" id="password" required />
+      <button type="submit" class="button">Check Strength</button>
+    </form>
+
+    <div id="result" class="strength"></div>
+  </div>
+
+  <script>
+    document.getElementById('passwordForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const pwd = document.getElementById('password').value;
+      const result = document.getElementById('result');
+
+      const hasUpper = /[A-Z]/.test(pwd);
+      const hasLower = /[a-z]/.test(pwd);
+      const hasDigit = /[0-9]/.test(pwd);
+      const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
+      const isLong = pwd.length >= 8;
+
+      let score = 0;
+      let suggestions = [];
+
+      if (hasUpper) score++; else suggestions.push("Add an uppercase letter");
+      if (hasLower) score++; else suggestions.push("Add a lowercase letter");
+      if (hasDigit) score++; else suggestions.push("Add a number");
+      if (hasSpecial) score++; else suggestions.push("Add a special character");
+      if (isLong) score++; else suggestions.push("Use at least 8 characters");
+
+      let strengthText = "";
+      if (score === 5) {
+        strengthText = `<span style="color: #22c55e;">Strong ✅</span>`;
+      } else if (score >= 3) {
+        strengthText = `<span style="color: #eab308;">Medium ⚠️</span>`;
+      } else {
+        strengthText = `<span style="color: #ef4444;">Weak ❌</span>`;
+      }
+
+      let improvedPwd = pwd;
+      if (!hasUpper) improvedPwd += "A";
+      if (!hasLower) improvedPwd += "a";
+      if (!hasDigit) improvedPwd += "1";
+      if (!hasSpecial) improvedPwd += "#";
+      if (improvedPwd.length < 8) improvedPwd += "x".repeat(8 - improvedPwd.length);
+
+      result.innerHTML = `
+        <p><strong>Strength:</strong> ${strengthText}</p>
+        ${suggestions.length ? `
+          <div class="suggestion">
+            Suggestions:<br/>
+            ${suggestions.map(s => `• ${s}`).join("<br/>")}
+          </div>
+        ` : `<div class="suggestion">Your password is secure! 🔒</div>`}
+        <p class="mt-2">Improved password: <code>${improvedPwd}</code></p>
+      `;
+    });
+  </script>
+
+</body>
+</html>
